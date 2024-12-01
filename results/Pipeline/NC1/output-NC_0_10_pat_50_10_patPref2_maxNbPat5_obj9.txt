@@ -1,0 +1,43 @@
+baseAlgorithms : ['Kmeans', 'Spectral']
+repeatBPgen : 1
+maxClustSize : 112
+Coverage : 50
+patType : pat
+V : 181
+clustPatDF.shape : (21, 181)
+Kmin : 2
+Kmax : 15
+minAppar : 0
+maxAppar : 2
+Discriminativeness : 10
+nbMaxMoreThan1 : 20
+nbMaxLessThan1 : 20
+nbMaxDiffThan1 : 40
+idObj : 9
+
+--- RESULTS ---
+
+times : [0.0, 0.0, 2.2, 0.24, 40.3]
+allClust : [[0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 29, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 59, 60, 62, 63, 64, 65, 66, 68, 69, 70, 71, 72, 74, 75, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111], [8, 26, 28, 38, 39, 58, 61, 67, 73, 76, 83, 101]]
+allClustLen : [102, 12]
+descrNames : [[['HasIf', 'InstDepth<=3.0', 'NbReturns<=1.0', 'NbTokens<=75.0', 'NbLines<=10.0', 'NbVars<=2.0', 'NbParams<=1.0', 'HasLoop', 'HasForLoop']], [['userdId_40', 'HasIfElse', 'InstDepth<=3.0', 'NbReturns<=1.0', 'NbTokens>75.0', 'NbParams<=1.0', 'HasLoop', 'HasForLoop']]]
+descrPatIds : [[0], [16, 17]]
+descrTagsIds : [['[33, 37, 43, 48, 24, 26, 28, 30, 31]'], ['[1, 33, 34, 37, 43, 49, 28, 30, 31]', '[1, 33, 34, 37, 49, 25, 27, 28, 30, 31]']]
+nbNotAttrib : 0
+nbMultiAttrib : 2
+nbOfClusterForEachInstance : [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 1 1 1 1 1 1 1 1 1
+ 1]
+---- : ----
+PCRs : [(0.57, 0.0), (0.58, 0.0)]
+DCs : [0.57, 0.75]
+IPSs : [(0.9, 0.0), (1.0, 0.0)]
+SINGs : [(1.0, 0.0), (1.0, 0.0)]
+IPCs : [(0.92, 0.0), (1.0, 0.0)]
+patPCRs : [[0.5686274509803921], [0.5833333333333334, 0.5833333333333334]]
+patDCs : []
+patIPSs : [[0.9], [1.0, 1.0]]
+patSINGs : [[1.0], [1.0, 1.0]]
+patIPCs : [[0.9166666666666666], [1.0, 1.0]]
+Optional results : []

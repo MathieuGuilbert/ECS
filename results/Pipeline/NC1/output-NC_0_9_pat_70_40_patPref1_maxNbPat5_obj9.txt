@@ -1,0 +1,43 @@
+baseAlgorithms : ['Kmeans']
+repeatBPgen : 1
+maxClustSize : 125
+Coverage : 70
+patType : pat
+V : 79
+clustPatDF.shape : (23, 79)
+Kmin : 2
+Kmax : 15
+minAppar : 0
+maxAppar : 2
+Discriminativeness : 40
+nbMaxMoreThan1 : 250
+nbMaxLessThan1 : 250
+nbMaxDiffThan1 : 500
+idObj : 9
+
+--- RESULTS ---
+
+times : [0.0, 0.0, 0.91, 0.1, 10.58]
+allClust : [[3, 6, 7, 9, 12, 14, 16, 19, 26, 28, 31, 33, 34, 35, 43, 47, 49, 50, 59, 61, 62, 63, 66, 67, 68, 71, 72, 73, 74, 75, 76, 84, 88, 93, 97, 105, 108, 113, 116, 117, 119], [32, 42, 55, 80, 102, 121], [4, 23, 25, 41, 54, 58, 60, 123], [13, 21, 27, 30, 38, 52, 86, 87, 89, 95, 106, 107, 114, 124]]
+allClustLen : [41, 6, 8, 14]
+descrNames : [[['HasWhileLoop', 'InstDepth<=3.0', 'HasIfInLoop', 'NbTokens>75.0', 'NbLines>10.0', 'NbVars>2.0', 'NbParams>1.0']], [['HasWhileLoop', 'InstDepth>3.0', 'HasIfInLoop', 'NbReturns<=1.0', 'userdId_18', 'NbTokens>75.0', 'NbLines>10.0', 'NbVars>2.0', 'NbParams>1.0']], [['HasWhileLoop', 'InstDepth<=3.0', 'HasIfInLoop', 'NbReturns<=1.0', 'NbTokens<=75.0', 'NbLines<=10.0', 'NbVars<=2.0', 'NbParams>1.0']], [['HasWhileLoop', 'InstDepth<=3.0', 'HasIfInLoop', 'NbReturns<=1.0', 'NbTokens<=75.0', 'NbLines>10.0', 'NbVars>2.0', 'NbParams>1.0']]]
+descrPatIds : [[2], [14], [19], [10]]
+descrTagsIds : [['[32, 34, 35, 39, 43, 51, 27, 29, 31]'], ['[32, 34, 35, 40, 43, 45, 19, 51, 27, 29, 31]'], ['[32, 34, 35, 39, 43, 45, 50, 26, 28, 31]'], ['[32, 34, 35, 39, 43, 45, 50, 27, 29, 31]']]
+nbNotAttrib : 56
+nbMultiAttrib : 0
+nbOfClusterForEachInstance : [0 0 0 1 1 0 1 1 0 1 0 0 1 1 1 0 1 0 0 1 0 1 0 1 0 1 1 1 1 0 1 1 1 1 1 1 0
+ 0 1 0 0 1 1 1 0 0 0 1 0 1 1 0 1 0 1 1 0 0 1 1 1 1 1 1 0 0 1 1 1 0 0 1 1 1
+ 1 1 1 0 0 0 1 0 0 0 1 0 1 1 1 1 0 0 0 1 0 1 0 1 0 0 0 0 1 0 0 1 1 1 1 0 0
+ 0 0 1 1 0 1 1 0 1 0 1 0 1 1]
+---- : ----
+PCRs : [(0.71, 0.0), (0.83, 0.0), (0.75, 0.0), (1.0, 0.0)]
+DCs : [0.71, 0.83, 0.75, 1.0]
+IPSs : [(0.79, 0.0), (1.0, 0.0), (0.98, 0.0), (0.77, 0.0)]
+SINGs : [(1.0, 0.0), (1.0, 0.0), (1.0, 0.0), (1.0, 0.0)]
+IPCs : [(1.0, 0.0), (1.0, 0.0), (1.0, 0.0), (0.92, 0.0)]
+patPCRs : [[0.7073170731707317], [0.8333333333333334], [0.75], [1.0]]
+patDCs : []
+patIPSs : [[0.7857142857142857], [1.0], [0.9829059829059829], [0.7657657657657657]]
+patSINGs : [[1.0], [1.0], [1.0], [1.0]]
+patIPCs : [[1.0], [1.0], [1.0], [0.9186991869918698]]
+Optional results : []

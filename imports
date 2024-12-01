@@ -1,0 +1,11 @@
+pip3 install sklearn
+pip3 install sklearn.metrics
+pip3 install itertools
+pip3 install scipy
+pip3 install cpmpy
+pip3 install pandas
+
+pip3 install tkinter
+pip3 install umap 
+pip3 install mplcursors
+pip3 install matplotlib

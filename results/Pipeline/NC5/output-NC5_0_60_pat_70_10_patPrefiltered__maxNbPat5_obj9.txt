@@ -1,0 +1,21 @@
+baseAlgorithhms : ['Kmeans']
+repeatBPgen : 1
+maxClustSize : 110
+patternCoveragePercentage : 70
+patType : pat
+V : 55
+clustPatDF.shape : (13, 55)
+Kmin : 3
+Kmax : 15
+minAppar : 0
+maxAppar : 2
+maxCovOutPer : 10
+nbMaxMoreThan1 : 20
+nbMaxLessThan1 : 20
+nbMaxDiffThan1 : 40
+idObj : 9
+
+--- RESULTS ---
+
+times : [0.0, 0.0, 0.8, 0.05]
+Error type:  : No solution found by the CP model

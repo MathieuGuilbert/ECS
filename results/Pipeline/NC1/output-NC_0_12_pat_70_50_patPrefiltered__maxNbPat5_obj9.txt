@@ -1,0 +1,43 @@
+baseAlgorithms : ['Kmeans']
+repeatBPgen : 1
+maxClustSize : 125
+Coverage : 70
+patType : pat
+V : 79
+clustPatDF.shape : (23, 79)
+Kmin : 2
+Kmax : 15
+minAppar : 0
+maxAppar : 2
+Discriminativeness : 50
+nbMaxMoreThan1 : 250
+nbMaxLessThan1 : 250
+nbMaxDiffThan1 : 500
+idObj : 9
+
+--- RESULTS ---
+
+times : [0.0, 0.0, 0.91, 0.1, 9.77]
+allClust : [[3, 6, 7, 9, 12, 14, 16, 19, 26, 28, 31, 33, 34, 35, 43, 47, 49, 50, 59, 61, 62, 63, 66, 67, 68, 71, 72, 73, 74, 75, 76, 84, 88, 93, 97, 105, 108, 113, 116, 117, 119], [4, 17, 18, 20, 23, 25, 39, 41, 45, 60, 64, 81, 83, 92, 110, 123], [32, 42, 55, 80, 102, 121]]
+allClustLen : [41, 16, 6]
+descrNames : [[['HasWhileLoop', 'InstDepth<=3.0', 'HasIfInLoop', 'NbReturns<=1.0', 'NbLines>10.0', 'NbVars>2.0', 'NbParams>1.0']], [['HasWhileLoop', 'InstDepth<=3.0', 'HasIfInLoop', 'NbTokens<=75.0', 'NbParams>1.0']], [['HasWhileLoop', 'InstDepth>3.0', 'HasIfInLoop', 'NbReturns<=1.0', 'userdId_18', 'NbTokens>75.0', 'NbLines>10.0', 'NbVars>2.0', 'NbParams>1.0']]]
+descrPatIds : [[1, 2], [11], [14]]
+descrTagsIds : [['[32, 34, 35, 39, 43, 45, 27, 29, 31]', '[32, 34, 35, 39, 43, 51, 27, 29, 31]'], ['[32, 34, 35, 39, 43, 50, 31]'], ['[32, 34, 35, 40, 43, 45, 19, 51, 27, 29, 31]']]
+nbNotAttrib : 62
+nbMultiAttrib : 0
+nbOfClusterForEachInstance : [0 0 0 1 1 0 1 1 0 1 0 0 1 0 1 0 1 1 1 1 1 0 0 1 0 1 1 0 1 0 0 1 1 1 1 1 0
+ 0 0 1 0 1 1 1 0 1 0 1 0 1 1 0 0 0 0 1 0 0 0 1 1 1 1 1 1 0 1 1 1 0 0 1 1 1
+ 1 1 1 0 0 0 1 1 0 1 1 0 0 0 1 0 0 0 1 1 0 0 0 1 0 0 0 0 1 0 0 1 0 0 1 0 1
+ 0 0 1 0 0 1 1 0 1 0 1 0 1 0]
+---- : ----
+PCRs : [(0.8, 0.1), (0.88, 0.0), (0.83, 0.0)]
+DCs : [0.95, 0.88, 0.83]
+IPSs : [(0.61, 0.18), (0.59, 0.0), (1.0, 0.0)]
+SINGs : [(1.0, 0.0), (1.0, 0.0), (1.0, 0.0)]
+IPCs : [(0.84, 0.09), (0.85, 0.0), (1.0, 0.0)]
+patPCRs : [[0.9024390243902439, 0.7073170731707317], [0.875], [0.8333333333333334]]
+patDCs : []
+patIPSs : [[0.4285714285714286, 0.7857142857142857], [0.5871559633027523], [1.0]]
+patSINGs : [[1.0, 1.0], [1.0], [1.0]]
+patIPCs : [[0.75, 0.9375], [0.8536585365853658], [1.0]]
+Optional results : []
