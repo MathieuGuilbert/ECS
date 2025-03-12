@@ -4,115 +4,7 @@ import sklearn.datasets
 import random
 from ucimlrepo import fetch_ucirepo
 from dataTreatment import *
-from vizual import *
 import numpy as np
-
-#---- TWITTER DATA ----
-def readTwitterPoliticalData(file):
-    print("Read Twitter dataset")
-    res=[]
-    with open(file, newline='') as csvfile:
-        datareader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        for row in datareader:
-                res.append(list(map(int, row)))#row)
-    return res
-
-def readTwitterPoliticalHashtags(file):
-    print("Read Twitter Hashtags")
-    res=[]
-    Header=True
-    with open(file, newline='') as csvfile:
-        datareader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        for row in datareader:
-            if(Header):
-                Header=False
-            else:
-                res.append(row[0])
-    return res
-
-#Read a file containing the communities associated to each instances
-#returns 2 lists, the first containing the usernames and the second a the communities in the form of a partition
-def readTwitterCommunities(file):
-    print("Read Twitter Communities")
-    usernames=[]
-    partition=[]
-    Header=True
-    with open(file, newline='') as csvfile:
-        datareader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        for row in datareader:
-            if(Header):
-                Header=False
-            else:
-                usernames.append(row[0])
-                partition.append(int(row[2])-1) #-1 to start at 0
-    return usernames,partition
-
-#Find accounts with less than minAct descriptors
-def findInactiveAccounts(data,minAct):
-    idx=[]
-    for i in range(len(data)):
-        if (sum(data[i])<minAct):
-            idx.append(i)
-    return idx
-
-#return a list l without the elements at the indexes in list idx.
-def removeIndexes(l,idx):
-    return [l[i] for i in range(len(l)) if i not in idx]
-
-def createTwitterDescrSpace(data,minAct):
-    res=[]
-    for inst in data:
-        instDescr=[]
-        for val in inst:
-            if val>=minAct:
-                instDescr.append(1)
-            else:
-                instDescr.append(0)
-        res.append(instDescr)
-    return res
-
-#General process of reading data for 1 of the 3 twitter political data
-def loadTwitterData(dataChoice):
-    if(dataChoice==0): #USA 1000, 5 communities
-        print("USA data")
-        twitterDataPath="/home/mathieu/Documents/Travail/These/datasets/TwitterElection/StructuralUserHashtagUSA.csv" #how many times users used all hashtags (n x t)
-        twitterHashPath="/home/mathieu/Documents/Travail/These/datasets/TwitterElection/nodesHashtagUSA.csv"
-        twitterCommunitiePath="/home/mathieu/Documents/Travail/These/datasets/TwitterElection/comUSA.csv"
-    elif(dataChoice==1): #USA 880, 2 communities #TODO : too many attr in nodesHashtag, need to select
-        print("USA data (small)")
-        twitterDataPath="/home/mathieu/Documents/Travail/These/datasets/TwitterElection/StructuralUserHashtagIUR.csv" #how many times users used all hashtags (n x t)
-        twitterHashPath="/home/mathieu/Documents/Travail/These/datasets/TwitterElection/nodesHashtagUSA.csv"
-        twitterCommunitiePath="/home/mathieu/Documents/Travail/These/datasets/TwitterElection/Comm1Indicies.csv"
-    elif(dataChoice==2): #FRANCE
-        print("FRANCE data")
-        twitterDataPath="/home/mathieu/Documents/Travail/These/datasets/TwitterElection/StructuralHashtagsFrance.csv" #how many times users used all hashtags (n x t)
-        twitterHashPath="/home/mathieu/Documents/Travail/These/datasets/TwitterElection/nodesHashtagsFrance.csv"
-        twitterCommunitiePath="/home/mathieu/Documents/Travail/These/datasets/TwitterElection/comFrance.csv"
-
-    twitterData=readTwitterPoliticalData(twitterDataPath)
-    twitterHash=readTwitterPoliticalHashtags(twitterHashPath)
-    twitterUsers,twitterCommunities=readTwitterCommunities(twitterCommunitiePath)
-    #print(twitterData[0])
-    print(len(twitterData)," instances, ",len(twitterData[0])," attributes")
-    print(len(twitterHash)," hashtags")
-    print(len(twitterUsers)," users")
-    print(max(twitterCommunities)+1," communities")
-
-    #Delete users having small amount of posts
-    minAct=10
-    idx=findInactiveAccounts(twitterData,minAct)
-    print(len(idx)," user active with less than ",minAct," hashtags")
-    twitterData=removeIndexes(twitterData,idx)
-    twitterUsers=removeIndexes(twitterUsers,idx)
-    twitterCommunities=removeIndexes(twitterCommunities,idx)
-    print(len(twitterData)," instances, ",len(twitterData[0])," attributes")
-    print("After there removal :")
-    print(len(twitterData)," instances")
-
-    #Convert data to create binary tag space 
-    twitterTagSpace=createTwitterDescrSpace(twitterData,minAct)
-    return twitterData,twitterTagSpace,twitterHash,twitterUsers,twitterCommunities
-
 
 #---- FLAGS DATA ----
 
@@ -304,9 +196,6 @@ def prepareAutomobileData(data):
             medians[i]=np.median([float(sublist[i]) for sublist in data])
             convertedValsNames.append(attributeNames[i]+"<="+str(medians[i]))
             convertedValsNames.append(attributeNames[i]+">"+str(medians[i]))
-            #convertedValsNames.append(attributeNames[i]+"_inf")
-            #convertedValsNames.append(attributeNames[i]+"_sup")
-            #print(attributeNames[i],'median :',medians[i])
     #print(z)
     print(medians)
 
@@ -355,42 +244,6 @@ def getClusterPrices(part):
         print(len(clust)," : ",round(np.mean(clustPrices),2),round(np.median(clustPrices),2),round(np.std(clustPrices),2))
 
 
-def postOccAutoAnalysis(Clustering,nbOfClusterForEachInstance):
-    def genLabels(selectedCluster:list,N:int,nbOfClusterForEachInstance:list):
-        '''Create a partition in the fitting format for tsne.'''
-        part=[]
-        for i in range(N):
-            if(nbOfClusterForEachInstance[i]==0): #cluster constituted of outliers
-                part.append(len(selectedCluster))
-            else:
-                for c in range(len(selectedCluster)):
-                    if i in selectedCluster[c]:
-                        part.append(c)
-                        break
-        return part  
-    numVals,binVals,binValsNames,prices,convertedVals,convertedValsNames,priceDistances,wholeDescriptorSpace,wholeDescriptorSpaceNames=prepareAutomobileData(readAutomobileData('/home/mathieu/Documents/Travail/These/datasets/Automobile/imports-85.data',False)) #AUTOMOBILE data
-    
-    resultFolderPath="/home/mathieu/Images"
-    labels=genLabels(Clustering,len(nbOfClusterForEachInstance),nbOfClusterForEachInstance)
-    #lauchTSNE(wholeDescriptorSpace,labels,len(Clustering)+1,resultFolderPath,"TSNE_auto_DescrSpace10",10, TSNEmetric='euclidean',TSNEinit='random',TSNEiter=5000)
-    #lauchTSNE(wholeDescriptorSpace,labels,len(Clustering)+1,resultFolderPath,"TSNE_auto_DescrSpace20",20, TSNEmetric='euclidean',TSNEinit='random',TSNEiter=5000)  
-    #lauchTSNE(wholeDescriptorSpace,labels,len(Clustering)+1,resultFolderPath,"TSNE_auto_DescrSpace1",1, TSNEmetric='euclidean',TSNEinit='random',TSNEiter=5000) 
-    #lauchTSNE(wholeDescriptorSpace,labels,len(Clustering)+1,resultFolderPath,"TSNE_auto_DescrSpace1",5, TSNEmetric='euclidean',TSNEinit='random',TSNEiter=5000)
-    
-    lauchTSNE(binVals,labels,len(Clustering)+1,resultFolderPath,"TSNE_auto_binVals5",5, TSNEmetric='euclidean',TSNEinit='random',TSNEiter=5000)
-    lauchTSNE(binVals,labels,len(Clustering)+1,resultFolderPath,"TSNE_auto_binVals10",10, TSNEmetric='euclidean',TSNEinit='random',TSNEiter=5000)
-    lauchTSNE(binVals,labels,len(Clustering)+1,resultFolderPath,"TSNE_auto_binVals20",20, TSNEmetric='euclidean',TSNEinit='random',TSNEiter=5000)
-    lauchTSNE(binVals,labels,len(Clustering)+1,resultFolderPath,"TSNE_auto_binVals30",30, TSNEmetric='euclidean',TSNEinit='random',TSNEiter=5000)
-    
-    #Prices
-    for k in range(len(Clustering)):
-        kPrices=[prices[o] for o in Clustering[k]]
-        print('Cluster',k,'prices: min=',np.min(kPrices),'max=',np.max(kPrices),'mean=',round(np.mean(kPrices),0),'std=',round(np.std(kPrices),0),'median=',round(np.median(kPrices),0))
-
-
-#autoRes=[[3, 32, 44, 45, 46, 47, 48], [0, 1, 2, 4, 5, 6, 7, 18, 30, 43, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 90, 93, 94, 95, 96, 131, 137, 138, 139, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158], [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 77, 84, 85, 86, 87, 88, 89, 91, 92, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 132, 133, 134, 135, 136, 140, 141, 142, 143, 144, 145, 146, 147]]
-#autoNbOfClusterForEachInstance=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-#postOccAutoAnalysis(autoRes,autoNbOfClusterForEachInstance)
 
 #-- Adult Dataset --
 
@@ -456,260 +309,6 @@ def computeAdultSimLabel(data):
                 iVals.append(0)
         res.append(iVals)
     return res
-
-#---- Old Artificial 2D datasets ----
-def OldPrepareArtif():
-    '''Get the small visual artificial dataset.'''
-    artFeatures=[[1,0],[0,1],[0,2],[1,1.75],[2,1.5],[3,0],[2,2.5],
-              [0.5,5.5],[1,4.5],[1,6.5],[2,5.5],
-                [3.5,3],[4,4],[4,1.75],[4.5,0],[5,3],[4.25,5.25]]
-    gt=[0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,2,2]
-    artTags=[[1,0,0,1,0],[1,0,0,1,0],[1,0,0,1,0],[1,0,0,1,0],[1,0,0,1,0],[1,0,0,1,0],[1,0,0,1,0],
-            [0,1,0,0,1],[0,1,1,0,0],[0,1,1,0,0],[0,1,1,0,0],
-            [0,1,0,0,1],[0,1,0,0,1],[1,0,0,1,0],[1,0,0,0,1],[1,0,0,0,1],[0,1,0,0,1]]
-    artTagNames=['round','square','white','red','green']
-    #vizualizePartition(3,artFeatures,gt,'testArt')
-    return artFeatures,artTags,artTagNames,gt
-
-
-def prepareHalfmoonRandom(precomputed=False,shapeBias=True,showDescr=False):
-    '''Get the halfmoon dataset with random descriptors.'''
-    Halfmoon=[[0.81680544,0.5216447],[1.61859642,-0.37982927],[-0.02126953,0.27372826],[-1.02181041,-0.07543984],[1.76654633,-0.17069874],[1.8820287,-0.04238449],[0.97481551,0.20999374],[0.88798782,-0.48936735],[0.89865156,0.36637762],[1.11638974,-0.53460385],[-0.36380036,0.82790185],[0.24702417,-0.23856676],[1.81658658,-0.13088387],[1.2163905,-0.40685761],[-0.8236696,0.64235178],[0.98065583,0.20850838],[0.54097175,0.88616823],[0.348031,-0.30101351],[0.35181497,0.88827765],[-0.77708642,0.82253872],[1.92590813,0.01214146],[0.86096723,-0.47653216],[0.19990695,0.99672359],[1.2895301,-0.37071087],[-0.27847636,1.02538452],[0.24187916,-0.07627812],[1.84988768,-0.09773674],[1.88406869,0.0449402],[0.165822,-0.08613126],[0.13861369,0.89639036],[0.89087024,0.52265882],[-0.22806587,0.84091882],[0.98279208,-0.46457771],[0.04237749,0.19457898],[0.76422612,0.67223332],[1.91108938,0.21178339],[0.43608432,-0.23007221],[0.96186938,0.09923426],[-0.84336684,0.52414334],[-0.04122466,0.35721873],[0.55507653,-0.42493298],[-0.4388286,0.85940389],[0.6532646,0.71235382],[0.10274835,0.06721414],[1.5486824,-0.34012196],[-0.37318371,0.95506411],[1.01706978,0.19210044],[-0.71923685,0.65476676],[0.16135772,-0.10771978],[0.86434045,-0.4594568],[-0.69717533,0.80133734],[0.32791175,-0.19619019],[1.98046734,0.03848682],[-0.90479784,0.05723938],[1.04515397,-0.50020349],[0.7534213,0.65688005],[0.54968577,0.73635744],[1.24038086,-0.47577903],[0.24918868,0.94246199],[-0.20756105,0.99290594],[0.35136403,-0.29065432],[-1.01628753,0.16290244],[1.78137056,-0.1244931],[0.87423825,0.53065346],[1.09997644,-0.46733763],[-1.07022744,0.2365448],[-0.15869858,1.01497482],[1.46569247,-0.3808977],[0.03025209,0.97792142],[-0.9365943,0.45674926],[0.66038307,-0.46576222],[-0.99144728,0.40662094],[0.46339847,-0.46605416],[-0.132006,0.52447234],[0.81566997,-0.42821617],[-0.94820947,0.37717096],[0.05300205,0.18597406],[0.92648634,0.40988975],[0.60689997,0.78279323],[0.72961391,-0.37215252],[1.9796026,0.12425417],[-0.02053902,0.97601558],[0.63818364,-0.49916763],[2.00639179,0.44597642],[0.02315539,0.24035667],[-0.35883877,1.02716833],[0.95414653,0.04177433],[-0.33921532,0.96308888],[0.59950492,-0.39774852],[1.99019644,0.39360049],[0.33125729,0.9365782],[0.99460422,0.35063363],[1.98845457,0.2628361],[-0.67473718,0.76419738],[2.00751107,0.3651166],[1.78298331,-0.11490401],[1.73616653,-0.22781554],[0.40646216,-0.25422904],[-1.02505346,0.24337404],[0.06414296,0.07759793],[1.30092145,-0.58089757],[1.97425572,0.30889897],[0.03228388,1.07937745],[1.03086156,-0.02389082],[-0.90062492,0.30653639],[0.08068561,0.29131373],[-0.98807765,0.1039765],[-0.47394435,0.96143212],[1.54651932,-0.35008497],[0.23332453,0.89648984],[-0.58481687,0.80318956],[0.0374878,1.02322111],[-0.01943215,1.07001032],[-0.85323667,0.39896937],[0.92635535,0.37695326],[1.43250553,-0.50148981],[0.60622756,0.66229531],[1.94401554,0.13685573],[0.57984414,-0.39868907],[0.74317519,0.50998316],[0.87116686,0.54105191],[-0.71045745,0.57281877],[-0.03081568,0.33644614],[-0.0298505,0.99553114],[-0.06313347,0.42194174],[-0.79223214,0.68354165],[0.92098434,0.04171051],[0.17794377,0.04536893],[1.34934828,-0.3941652],[1.98387143,0.50898445],[1.00104892,0.27158454],[-0.5425424,0.76257612],[-0.9969011,0.47226403],[0.23408511,-0.15381658],[1.21437019,-0.40862022],[1.60101745,-0.17940652],[1.15844202,-0.40408591],[-1.00922523,0.2161359],[2.01865957,0.50313426],[0.88839866,0.39017093],[0.10170896,-0.01206481],[-0.01241966,0.47064905],[0.44566504,0.94595998],[-0.3569344,0.98319206],[-0.43845037,0.88374167],[1.01534178,0.06687469],[0.2310607,0.01153495],[1.35098772,-0.44520507],[0.25423421,1.0205525],[-0.00586456,0.24919627],[0.4752852,-0.37028432],[1.68071768,-0.34775296],[0.84564282,0.45629647],[0.34218757,0.90613948],[0.58741368,-0.35078742],[-0.17818292,0.96641541],[1.25865528,-0.4740009],[0.33542814,-0.18023343],[0.52630774,0.94876068],[0.6424051,0.77717105],[0.15770292,0.04709417],[1.11178863,-0.5065278],[0.60370903,0.83759912],[1.48247118,-0.32721961],[0.39793421,-0.36876588],[1.67240934,-0.09328043],[0.47551295,0.85547255],[0.70605116,-0.42241887],[1.56418943,-0.34860626],[0.94012854,-0.57508877],[0.61400301,0.83833823],[-1.07139757,0.02669316],[-0.91308996,0.52626435],[-0.74824469,0.51823742],[0.14688241,0.0297201],[0.94362014,-0.44829425],[1.84489829,0.40601924],[-0.66827347,0.69085682],[-0.7362418,0.59951884],[0.60146482,0.72551706],[1.47437703,-0.37541022],[-0.88760005,0.50864517],[1.92892164,0.18201791],[1.78673422,-0.27470711],[1.95130228,0.26574549],[0.33471666,0.98057089],[-0.16884749,0.89206411],[0.77063994,-0.51750338],[-0.88700503,0.36696366],[-0.62886492,0.79087211],[-0.93006783,0.38754885],[0.42447858,0.93268774],[0.80861392,0.53599924],[0.94000928,0.27111431],[-0.01609181,0.37369612],[-0.53633385,0.86026837],[1.88281749,0.24435589],[0.17575161,-0.007231],[0.12423604,1.00790161],[1.62152568,-0.22328525]]
-    HalfmoonGT=[0,1,1,0,1,1,0,1,0,1,0,1,1,1,0,0,0,1,0,0,1,1,0,1,0,1,1,1,1,0,0,0,1,1,0,1,1,0,0,1,1,0,0,1,1,0,0,0,1,1,0,1,1,0,1,0,0,1,0,0,1,0,1,0,1,0,0,1,0,0,1,0,1,1,1,0,1,0,0,1,1,0,1,1,1,0,0,0,1,1,0,0,1,0,1,1,1,1,0,1,1,1,0,0,0,1,0,0,1,0,0,0,0,0,0,1,0,1,1,0,0,0,1,0,1,0,0,1,1,1,0,0,0,1,1,1,1,0,1,0,1,1,0,0,0,0,1,1,0,1,1,1,0,0,1,0,1,1,0,0,1,1,0,1,1,1,0,1,1,1,0,0,0,0,1,1,1,0,0,0,1,0,1,1,1,0,0,1,0,0,0,0,0,0,1,0,1,1,0,1]
-    #Halfmoon,HalfmoonGT=sklearn.datasets.make_moons(n_samples=200,noise=0.05)
-    N=len(Halfmoon)
-    K=2
-    halfmoonTagsNames=['blue','red','white','round','square','triangle','small','big']
-    
-    clustHalfmoon=[[i for i in range(N) if HalfmoonGT[i]==k] for k in range(K)]
-    if(precomputed):
-        descrSpace=readDataFile('/home/mathieu/Documents/Travail/These/git/stage-involvd-mathieu-guilbert-2021/Devs/data/halfmoonRandomTag.csv')
-        #descrSpace=readDataFile('/home/mathieu/Documents/Travail/These/git/stage-involvd-mathieu-guilbert-2021/Devs/data/halfmoonLessRandomTag.csv')
-        descrSpace=[[int(i) for i in line] for line in descrSpace]
-    else:    
-        colorsC0=select_random_Ns(clustHalfmoon[0], int(0.8*len(clustHalfmoon[0]))) #sklearn.utils.random.sample_without_replacement(len(clustHalfmoon[0]), 0.8*len(clustHalfmoon[0]), method='auto', random_state=None)  
-        blueC0=colorsC0[0]
-        colorsC1=select_random_Ns(clustHalfmoon[1], int(0.8*len(clustHalfmoon[1]))) #sklearn.utils.random.sample_without_replacement(len(clustHalfmoon[1]), 0.8*len(clustHalfmoon[1]), method='auto', random_state=None)  
-        redC1=colorsC1[0]
-        white=colorsC0[1]+colorsC1[1]
-        if(not shapeBias):
-            #select randomly 75% of elements in C0 to have blue tag, 75% of elements in C1 to have red tag, and designate others as green 
-            allSquare=[]
-            allRound=[]
-            allTri=[]
-            for c in range(K):
-                cSquare,cRound,cTri=select_random_Ns(clustHalfmoon[c], 45)
-                allSquare+=[i for i in cSquare]
-                allRound+=[i for i in cRound]
-                allTri+=[i for i in cTri]
-        else:
-            bsq=select_random_Ns(blueC0, int(0.55*len(clustHalfmoon[0])))
-            blueSquare=bsq[0]
-            bluenotsquare=bsq[1]
-            bss=select_random_Ns(bluenotsquare, int(0.15*len(clustHalfmoon[0])))
-            blueRound=bss[0]
-            blueTriangle=bss[1]
-            w0s=select_random_Ns(colorsC0[1], int(0.1*len(clustHalfmoon[0])))
-            white0sqr=w0s[0]
-            white0round=w0s[1]
-
-            rsq=select_random_Ns(redC1, int(0.55*len(clustHalfmoon[1])))
-            redRound=rsq[0]
-            rednotRound=rsq[1]
-            rss=select_random_Ns(rednotRound, int(0.15*len(clustHalfmoon[1])))
-            redSquare=rss[0]
-            redTriangle=rss[1]
-            w1s=select_random_Ns(colorsC1[1], int(0.1*len(clustHalfmoon[1])))
-            white1round=w1s[0]
-            white1sqr=w1s[1]
-
-            allSquare=blueSquare+white0sqr+redSquare+white1sqr
-            allRound=blueRound+white0round+redRound+white1round
-            allTri=blueTriangle+redTriangle
-
-        instSizes=select_random_Ns([i for i in range(N)], int(N/2))
-
-        #create descr space
-        descrSpace=[]
-        for i in range(N):
-            line=[]
-            #Colors
-            if(i in blueC0):
-                line.append(1)
-            else:
-                line.append(0)
-            if(i in redC1):
-                line.append(1)
-            else:
-                line.append(0)
-            if(i in white):
-                line.append(1)
-            else:
-                line.append(0)
-            #Shapes
-            if(i in allSquare):
-                line.append(1)
-            else:
-                line.append(0)
-            if(i in allRound):
-                line.append(1)
-            else:
-                line.append(0)
-            if(i in allTri):
-                line.append(1)
-            else:
-                line.append(0)
-            if(i in instSizes[0]):
-                line.append(1)
-                line.append(0)
-            else:
-                line.append(0)
-                line.append(1)
-            descrSpace.append(line)
-        #print(len(descrSpace[0]),len(halfmoonTagsNames))
-        #print(allSquare)
-        #print(allRound)
-        #print(allTri)
-        #print(descrSpace[0])
-        #print(descrSpace[1])
-        #writeMat('/home/mathieu/Documents/Travail/These/git/stage-involvd-mathieu-guilbert-2021/Devs/data/halfmoonLessRandomTag.csv',descrSpace)
-        writeMat('/home/mathieu/Documents/Travail/These/git/stage-involvd-mathieu-guilbert-2021/Devs/data/halfmoonRandomTag.csv',descrSpace)
-        #writeMat('/home/mathieu/Documents/Travail/These/git/stage-involvd-mathieu-guilbert-2021/Devs/data/halfmoonRandom.csv',Halfmoon)
-        #writeMat('/home/mathieu/Documents/Travail/These/git/stage-involvd-mathieu-guilbert-2021/Devs/data/halfmoonRandomGT.csv',HalfmoonGT)
-    
-    colorsPart=[]
-    shapesPart=[]
-    sizesPart=[]
-    for i in range(N): #'blue','red','white','round','square','triangle','small','big'
-        if(descrSpace[i][0]==1):
-            colorsPart.append(0)
-        elif(descrSpace[i][1]==1):
-            colorsPart.append(1)
-        elif(descrSpace[i][2]==1):
-            colorsPart.append(2)
-
-        if(descrSpace[i][3]==1):
-            shapesPart.append(0)
-        if(descrSpace[i][4]==1):
-            shapesPart.append(1)
-        if(descrSpace[i][5]==1):
-            shapesPart.append(2)
-
-        if(descrSpace[i][6]==1):
-            sizesPart.append(0)
-        if(descrSpace[i][7]==1):
-            sizesPart.append(1)
-
-    if(showDescr):
-        showArtifData(Halfmoon,colorsPart,shapesPart,sizesPart)
-        #print(z)
-    
-    #cluster composition (use LCM ?)
-    from skmine.itemsets import LCM
-    for k in range(K):
-        tagsInC=getTagsIdsForClusterInstances(descrSpace,clustHalfmoon[k])
-        #print('tagsInC:',tagsInC)
-        lcm = LCM(min_supp=1)
-        patterns = lcm.fit_discover(tagsInC)
-        patK= patterns.values.tolist()
-        patKnames=[[[halfmoonTagsNames[t] for t in pat[0]],pat[1]] for pat in patK]
-        #print('patK:',patK)
-        print('possible pat for C'+str(k)+':',patKnames)
-
-    discretizedTag,discretizedTagNames=convertNumToBin(Halfmoon,['X','Y'],2)
-    #print(discretizedTag)
-    #print(z)
-
-    return Halfmoon,HalfmoonGT,halfmoonTagsNames,descrSpace,clustHalfmoon,colorsPart,shapesPart,sizesPart,discretizedTag,discretizedTagNames
-
-def prepareCirclesRandom(precomputed=False):
-    '''Get the circles dataset with random descriptors.'''
-    circles,circlesGT=noisy_circles = sklearn.datasets.make_circles(n_samples=200, factor=0.5, noise=0.01)
-    N=len(circles)
-    K=2
-    circlesTagsNames=['blue','red','white','round','square','triangle','small','big']
-    #vizualizePartition(K,circles,circlesGT,'moons')
-    
-    if(precomputed):
-        descrSpace=readDataFile('/home/mathieu/Documents/Travail/These/git/stage-involvd-mathieu-guilbert-2021/Devs/data/circlesRandomTag.csv')
-        descrSpace=[[int(i) for i in line] for line in descrSpace]
-    else:
-        clustcircles=[[i for i in range(N) if circlesGT[i]==k] for k in range(K)]
-        #TODO select randomly 75% of elements in C0 to have blue tag, 75% of elements in C1 to have red tag, and designate others as green 
-        allSquare=[]
-        allRound=[]
-        allTri=[]
-        for c in range(K):
-            cSquare,cRound,cTri=select_random_Ns(clustcircles[c], 45)
-            allSquare+=[i for i in cSquare]
-            allRound+=[i for i in cRound]
-            allTri+=[i for i in cTri]
-        colorsC0=select_random_Ns(clustcircles[0], int(0.9*len(clustcircles[0]))) #sklearn.utils.random.sample_without_replacement(len(clustHalfmoon[0]), 0.8*len(clustHalfmoon[0]), method='auto', random_state=None)  
-        blueC0=colorsC0[0]
-        colorsC1=select_random_Ns(clustcircles[1], int(0.9*len(clustcircles[1]))) #sklearn.utils.random.sample_without_replacement(len(clustHalfmoon[1]), 0.8*len(clustHalfmoon[1]), method='auto', random_state=None)  
-        redC1=colorsC1[0]
-        white=colorsC0[1]+colorsC1[1]
-        instSizes=select_random_Ns([i for i in range(N)], int(N/2))
-
-        #create descr space
-        descrSpace=[]
-        for i in range(N):
-            line=[]
-            #Colors
-            if(i in blueC0):
-                line.append(1)
-            else:
-                line.append(0)
-            if(i in redC1):
-                line.append(1)
-            else:
-                line.append(0)
-            if(i in white):
-                line.append(1)
-            else:
-                line.append(0)
-            #Shapes
-            if(i in allSquare):
-                line.append(1)
-            else:
-                line.append(0)
-            if(i in allRound):
-                line.append(1)
-            else:
-                line.append(0)
-            if(i in allTri):
-                line.append(1)
-            else:
-                line.append(0)
-            if(i in instSizes[0]):
-                line.append(1)
-                line.append(0)
-            else:
-                line.append(0)
-                line.append(1)
-            descrSpace.append(line)
-        print(len(descrSpace[0]),len(circlesTagsNames))
-        print(allSquare)
-        print(allRound)
-        print(allTri)
-        print(descrSpace[0])
-        print(descrSpace[1])
-        writeMat('/home/mathieu/Documents/Travail/These/git/stage-involvd-mathieu-guilbert-2021/Devs/data/circlesRandomTag.csv',descrSpace)
-
-    return circles,circlesGT,circlesTagsNames,descrSpace
-
-
-def select_random_Ns(l, k):
-    '''randomly put all elements of list l into sublist of size k.
-
-    Source: https://www.geeksforgeeks.org/python-select-random-value-from-a-list'''
-    random.shuffle(l)
-    res = []
-    for i in range(0, len(l), k):
-        res.append(l[i:i + k])
-    return res
-
-#prepareHalfmoonRandom()
 
 #---- IRIS datasets ----
 
@@ -833,92 +432,6 @@ def convertNumToBin(X:list,attributeNames:list,nbDecom:int):
             descriptors.append(descr)
     
     return descriptors,convertedValsNames
-
-#---- Secondary Mushroom ----
-
-#TODO convert categorical attributes
-def prepareSecondaryMushroom():
-    # fetch dataset 
-    secondary_mushroom  = fetch_ucirepo(id=848) 
-    #first mushroom is = fetch_ucirepo(id=73) , but it does not have numerical features
-
-    capshape=['b', 'c', 'x', 'f','s', 'p', 'o']
-    capsurface=['i', 'g','y','s','h', 'l','k','t','w', 'e']
-    capcolor=['n', 'b', 'g', 'r', 'p', 'u', 'e', 'w', 'y', 'l', 'o', 'k']
-    gillattachment=['a', 'x', 'd', 'e', 's','p', 'f', '?']
-    gillspacing=['c', 'd', 'f']
-    gillcolor=['n', 'b', 'g', 'r', 'p', 'u', 'e', 'w', 'y', 'l', 'o', 'k','f']
-    stemroot=['b','s', 'c', 'u','e','z', 'r']
-    stemsurface=['i', 'g','y','s','h', 'l','k','t','w', 'e','f']
-    stemcolor=['n', 'b', 'g', 'r', 'p', 'u', 'e', 'w', 'y', 'l', 'o', 'k','f']
-    veiltype=['p', 'u']
-    veilcolor=['n', 'b', 'g', 'r', 'p', 'u', 'e', 'w', 'y', 'l', 'o', 'k','f']
-    ringtype=['c', 'e', 'r', 'g','l', 'p', 's', 'z', 'y', 'm', 'f', '?']
-    sporeprintcolor=['n', 'b', 'g', 'r', 'p', 'u', 'e', 'w', 'y', 'l', 'o', 'k']
-    habitat=['g', 'l', 'm', 'p', 'h', 'u', 'w', 'd']
-    season=['s', 'u', 'a', 'w']
-    
-    # data (as pandas dataframes) 
-    X = secondary_mushroom.data.features 
-    y = secondary_mushroom.data.targets
-    N=len(X)
-
-    propNames=secondary_mushroom.variables.name.to_numpy().tolist()[1:]
-    #print('debug x0',X[0])
-    #print('debug proNames mushroom:',propNames)
-    tagNames=propNames.copy()
-
-    #2 classes: edible and poisous
-    gt=[int(i=='e') for i in y.to_numpy().flatten()] #y #[int(x[0]=='e') for x in X]
-    #print('debug gt:',gt)
-    
-    data=X.to_numpy().tolist()
-
-    numIds=[1,9,10]#starting from 0 counting the calss column
-    featureSpace=[]
-
-    for i in range(N):
-        featureLine=[]
-        for id in numIds:
-            featureLine.append(data[i][id-1])
-        featureSpace.append(featureLine)
-
-    binIds=[5,16]
-    nominalIds=[2,3,4,6,7,8,11,12,13,14,15,17,18,19,20]
-    nominal=[capshape,capsurface,capcolor,gillattachment,gillspacing,gillcolor,stemroot,stemsurface,stemcolor,veiltype,veilcolor,ringtype,sporeprintcolor,habitat,season]
-
-    tagNames=[]
-    tagSpace=[]
-    for feature in binIds:
-        tagLine=[]
-        tagNames.append(propNames[feature-1])
-        for i in range(N):
-            tagLine.append(int(data[i][feature-1]=='t'))
-        tagSpace.append(tagLine)
-    #print('debug bin passed',len(tagSpace),len(tagSpace[0]))
-            
-    for f in range(len(nominalIds)):
-        feature=nominalIds[f]
-        #print(f,'out of',len(nominalIds))
-        for attr in nominal[f]: #for each possible attribute
-            #print('attr:',attr,'for',propNames[feature-1])
-            tagLine=[]
-            tagNames.append(propNames[feature-1]+'_'+attr)
-            for i in range(N):
-                tagLine.append(int(data[i][feature-1]==attr)) #if empty attr then all will be set to 0.
-            tagSpace.append(tagLine)
-    #print('debug categorical passed;',len(tagSpace),len(tagSpace[0]))
-
-    transposed_tagSpace = np.transpose(tagSpace)
-    #print('debug transposed;',len(transposed_matrix),len(transposed_matrix[0]))
-    #print('debug names',tagNames,len(tagNames))
-    print('- End read SecondaryMushroom -')
-    #print(len(featureSpace),len(featureSpace[0]),len(tagNames),len(gt))
-    return featureSpace,transposed_tagSpace,tagNames,gt
-
-#test mushroom
-#prepareSecondaryMushroom()
-#print(z)
 
 
 #---- Zoo ----
@@ -1125,84 +638,9 @@ def prepareAWA2():
 
     return featureSpace,tagSpace,tagNames,groundTruth,classesNames
 
-#--------- Treecut ---------
-
-def readFinaData(featurefile,descrfile):
-    print("Read  Fina's treecut data")
-    groundTruth=[]
-    fSpace=[]
-    CT=[]
-    with open(featurefile, newline='') as csvfile:
-        datareader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        for row in datareader:
-            fSpace.append(row[1:])
-    with open(descrfile, newline='') as csvfile:
-        datareader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        for row in datareader:
-            groundTruth.append(int(row[0]))
-            CT.append(row[1:])
-    thresholds=[0.11533889477407566, 0.1203077098366005, 0.11511143406008541, 0.10949628381590712, 0.1104818764095347, 0.08652794627493725, 0.0859585635282215, 0.0896137509532199, 0.12247916373037748, 0.08693955076534798]
-    for i in range(len(CT)):
-        print(len(CT[i]),len(thresholds))
-        CT[i]=[int(float(CT[i][j])>thresholds[j]) for j in range(len(CT[0]))]
-        fSpace[i]=[float(fSpace[i][j]) for j in range(len(fSpace[0]))]
-    return groundTruth,CT,fSpace
-
-
-def readTreecutData(featurefile,groundTruthFile):
-    '''Read the Treecut dataset.'''
-
-    print("Read treecut data")
-    groundTruth=[]
-    fSpace=[]
-    fNames=[]
-    dSpace=[]
-    #Read
-    init=True
-    with open(featurefile, newline='') as csvfile:
-        datareader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        for row in datareader:
-            if(init):
-                fNames=row
-                init=False
-            else:
-                #CreateCT
-                prevVal=None
-                fSpaceRow=[]
-                dSpaceRow=[]
-                for v in row:
-                    currentVal=float(v)
-                    if(prevVal!=None):
-                        diff=prevVal-currentVal
-                        dSpaceRow.append(diff)
-                    fSpaceRow.append(currentVal)
-                    prevVal=currentVal
-
-                fSpace.append(fSpaceRow)
-                dSpace.append(dSpaceRow)
-
-    with open(groundTruthFile, newline='') as csvfile:
-        datareader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        for row in datareader:
-            groundTruth.append(int(row[0]))
-
-    #Discretize
-    fDiscr,convertedValsNames=convertNumToBin(fSpace,fNames,2)
-    print(fSpace[0])
-    print('fDiscr: ',fDiscr[0])
-    print(convertedValsNames)
-    
-    return groundTruth,fSpace,dSpace,fNames,fDiscr,convertedValsNames
-
-#treecutpath="/home/mathieu/Documents/Travail/These/datasets/treecut/tree_cut_data.csv"
-#treecutGTpath="/home/mathieu/Documents/Travail/These/datasets/treecut/ground_truth.csv"
-#t=readTreecutData(treecutpath,treecutGTpath)
-#print(t)
-
-
-#NewCaledonia dataset
+#--------- NewCaledonia dataset -----------
 def prepareNCdataset(path):
-    '''Prepare the NewCaledonida dataset used and given by Thibaut.'''
+    '''Prepare the NewCaledonida dataset used and given by Thibaut Martinet.'''
     rawdata=readDataFile(path,delimiter=',')
     attributeNames=rawdata.pop(0)
     N=len(rawdata)
@@ -1269,12 +707,10 @@ def prepareNCdataset(path):
     
     return featureSpace,tagSpace,tagNames, exercisePart
 
-#CSpath='/home/mathieu/Documents/Travail/These/datasets/Thibaut/NC1014_clustering.csv'
-#prepareNCdataset(CSpath)
 
 #TODO NewCaledonia dataset - specific exercise
 def prepareNCexercice(path,specific_ex):
-    '''Prepare a cluster from the NewCaledonida dataset used and given by Thibaut.'''
+    '''Prepare a cluster from the NewCaledonida dataset used and given by Thibaut Martinet.'''
     rawdata=readDataFile(path,delimiter=',')
     attributeNames=rawdata.pop(0)
     N=len(rawdata)
@@ -1331,8 +767,6 @@ def prepareNCexercice(path,specific_ex):
 
         #Numerical
         elif(attributeNames[featureInd] in numToBin):
-            #discretization (median ?)
-            #print(attributeNames[featureInd],'discetization')
             median=np.median([float(sublist[featureInd]) for sublist in rawdata])
             for i in range(N):
                 if(specific_ex==exercisePart[i]):
@@ -1353,13 +787,6 @@ def prepareNCexercice(path,specific_ex):
     tagSpace=[tagSpace[i] for i in range(N) if specific_ex==exercisePart[i]]
 
     return featureSpace,tagSpace,tagNames,exercisePart
-
-#CSpath='/home/mathieu/Documents/Travail/These/datasets/Thibaut/NC1014_clustering.csv'
-#featureSpace,tagSpace,tagNames,exercisePart=prepareNCexercice(CSpath,specific_ex=0)
-#print(tagNames)
-#print(range(len(tagNames)))
-#print(len(tagSpace),len(tagSpace[0]),len(tagNames))
-#print(tagNames[66])
 
 #---- 2D Artificial datasets ----
 def artifDataGeneration(overlapOpt=0):

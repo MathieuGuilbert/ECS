@@ -1,0 +1,32 @@
+--- AUTOMOBILE DT ccp_alpha=0.02 ---
+
+Paths to leaves for C0 (110 points):
+Path: not rwd, four, not saab
+Path: rwd, toyota, four
+Leaf Size: [100, 10]
+Coverage: [88.18, 8.18]
+Discrimination: [0.96, 0.99]
+
+Paths to leaves for C1 (10 points):
+Path: rwd, not toyota, mercedes-benz
+Leaf Size: [5]
+Coverage: [50.0]
+Discrimination: [1.0]
+
+Paths to leaves for C2 (39 points):
+Path: not rwd, not four
+Path: not rwd, four, saab
+Path: rwd, not toyota, not mercedes-benz
+Path: rwd, toyota, not four
+Leaf Size: [7, 6, 28, 3]
+Coverage: [12.82, 10.26, 58.97, 7.69]
+Discrimination: [0.95, 0.99, 0.8, 1.0]
+
+
+Total number of errors:  13
+Error per cluster:  [4, 5, 4]
+EC per cluster:  [0.96, 0.5, 0.9]
+mean PCR per cluster:  [0.48, 0.5, 0.22]
+mean IPC per cluster:  [0.98, 1.0, 0.94]
+Number of pattern: [2, 1, 4]
+size of pattern: [[3, 3], [3], [2, 3, 3, 3]]

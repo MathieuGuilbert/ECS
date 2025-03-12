@@ -9,14 +9,12 @@ from dataTreatment import writeMat
 
 def evaluationPipeline(dataNames,dataPaths,Algorithms,covValues,patTypes,minClustSizes,maxClustSizes,
                        discrValues,overlapValues,unatValues,finalKsMin,finalKsMax,objs,rBP,resPath,
-                       maxNbPatPerClustList=[5],patPreferences=[-1],ncEx=None,skipDiscr=True,treeCompare=False):
+                       maxNbPatPerClustList=[5],patPreferences=[-1],ncEx=None,skipDiscr=True):
+    """Function for performing a pipeline of tests with different parameters for the same dataset."""
     BP=[]
     noRes=[]
     Skipped=[]
-    allTreeRes=[]
     allRes=[]
-    treeRes=[]
-    #allRes.append(['Coverage','Discr.','patType','ov','un','finKmin','finKmax','obj','PCR','DC','IPC','ARI','len'])
     allRes.append(['Coverage','Discr.','patType','ov','un','finKmin','finKmax','maxNbPat','patPreference','obj','PCR','DC','IPC','Size','Other'])
     nbBP=1
     nbLaunches=nbBP*len(covValues)*len(patTypes)*len(minClustSizes)*len(maxClustSizes)*len(discrValues)*len(overlapValues)*len(unatValues)*len(finalKsMin)*len(finalKsMax)*len(patPreferences)*len(maxNbPatPerClustList)*len(objs)
@@ -77,7 +75,7 @@ def evaluationPipeline(dataNames,dataPaths,Algorithms,covValues,patTypes,minClus
                                                             res=launchICES(dataNames[dts],dataPaths[dts],path,fileName,cov,discr,
                                                                             patType,minK,maxK,finKmin,finKmax,Algorithms,obj,
                                                                         nbMaxMoreThan1=ov,nbMaxLessThan1=un,repeatBPgen=rBP,maxNbPatPerClust=maxNbPat,ncEx=ncEx,
-                                                                        precompBC=BP,precompFiltered=Filtered,allowInclusion=allowInclusion,patPreference=patPreference,treeCompare=treeCompare)
+                                                                        precompBC=BP,precompFiltered=Filtered,allowInclusion=allowInclusion,patPreference=patPreference)
                                                             #IF NO RESULTS, NO NEED TO TEST OTHER OBJECTIVES
                                                             if(res==None):
                                                                 noRes.append(cpt)
@@ -85,14 +83,12 @@ def evaluationPipeline(dataNames,dataPaths,Algorithms,covValues,patTypes,minClus
                                                                 needToTestNbpat=False #no need to test for other max number of patterns (WARNING works only if list start by None)
                                                                 break
                                                             else:
-                                                                _,_,_,_,_,_,_,_,_,nbOfClusterForEachInstance,PCRs,DCs,IPSs,SINGs,IPCs,optionalRes,treeRes=res
+                                                                _,_,_,_,_,_,_,_,_,nbOfClusterForEachInstance,PCRs,DCs,IPSs,SINGs,IPCs,optionalRes=res
                                                                 #TODO keep relevent info
                                                                 if(len(optionalRes)==len(PCRs)):
                                                                     allRes.append([cov,discr,patType,ov,un,finKmin,finKmax,maxNbPat,pP,obj,round(np.mean([o[0] for o in PCRs]),2),round(np.mean(DCs),2),round(np.mean([o[0] for o in IPCs]),2),len(PCRs),optionalRes[0]])
                                                                 else:
                                                                     allRes.append([cov,discr,patType,ov,un,finKmin,finKmax,maxNbPat,pP,obj,round(np.mean([o[0] for o in PCRs]),2),round(np.mean(DCs),2),round(np.mean([o[0] for o in IPCs]),2),len(PCRs),optionalRes])
-                                                                if(treeCompare):
-                                                                    allTreeRes.append(treeRes)
                                                                 if(patType=='pat' and isAnyPatRes==False):
                                                                     isAnyPatRes=True
                                                                 if(BP==[]):
@@ -112,11 +108,10 @@ def evaluationPipeline(dataNames,dataPaths,Algorithms,covValues,patTypes,minClus
     print(len(noRes)," configurations with no results.")
     print(len(Skipped)," configurations skipped.")
     print("--- END ---")
-    return allRes,treeRes
+    return allRes
 
 def testEvalPipeline(data,optEx=None,optKmeansBL=False,optAlgorithms=[]):
     '''Launch the evaluation pipeline for a particular dataset.'''
-    treeCompare=False
     skipDiscr=True
     if(data=="iris"):
         dataNames=["iris"]
@@ -254,7 +249,6 @@ def testEvalPipeline(data,optEx=None,optKmeansBL=False,optAlgorithms=[]):
         finalKsMax=[2]
         objs=[3]
         rBP=2
-        treeCompare=not True
     elif(data=="artif0"):
         dataNames=[data]
         dataPaths=[""]
@@ -270,7 +264,6 @@ def testEvalPipeline(data,optEx=None,optKmeansBL=False,optAlgorithms=[]):
         finalKsMax=[3]
         objs=[9]
         rBP=5
-        treeCompare=not True
     elif(data=="artif1"):
         dataNames=[data]
         dataPaths=[""]
@@ -286,7 +279,6 @@ def testEvalPipeline(data,optEx=None,optKmeansBL=False,optAlgorithms=[]):
         finalKsMax=[3]
         objs=[9]
         rBP=5
-        treeCompare=not True
     elif(data=="artif2"):
         dataNames=[data]
         dataPaths=[""]
@@ -302,7 +294,6 @@ def testEvalPipeline(data,optEx=None,optKmeansBL=False,optAlgorithms=[]):
         finalKsMax=[3]
         objs=[9]
         rBP=5
-        treeCompare=not True
     elif("NC" in data):
         NCPath='NC1014_clustering.csv'
         dataNames=[data]
@@ -337,11 +328,10 @@ def testEvalPipeline(data,optEx=None,optKmeansBL=False,optAlgorithms=[]):
     patPreferences=[0] #-1,0,1,2,3
     resPath="../results/Pipeline"
     print('Start evaluationPipeline')
-    allRes,treeRes=evaluationPipeline(dataNames,dataPaths,Algorithms,covValues,patTypes,minClustSizes,maxClustSizes,discrValues,
+    allRes=evaluationPipeline(dataNames,dataPaths,Algorithms,covValues,patTypes,minClustSizes,maxClustSizes,discrValues,
                        overlapValues,unatValues,finalKsMin,finalKsMax,objs,rBP,resPath,
-                       maxNbPatPerClustList=maxNbPatPerClustList,patPreferences=patPreferences,ncEx=optEx,skipDiscr=skipDiscr,treeCompare=treeCompare)
+                       maxNbPatPerClustList=maxNbPatPerClustList,patPreferences=patPreferences,ncEx=optEx,skipDiscr=skipDiscr)
     writeMat(resPath+'/'+dataNames[0]+'/Results.csv',allRes)
-    #print(treeRes)
 
 testEvalPipeline("artif0")
 testEvalPipeline("artif1")

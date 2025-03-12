@@ -1,7 +1,7 @@
 # ECS
 This repository contains the code associated to the Explainable Clustering (ensemble) Selection (ECS) approach. 
 
-File "imports" is a script importing all necesary libraries.
+File "imports" is a script importing all necessary libraries.
 
 %----------------
 
@@ -15,12 +15,15 @@ clusterSelection.py: handling the base partition generation, cluster selection a
 
 postProcess.py: contains all functions needed after the execution of the model, such as quality measures
 
-compare.py: contains functions used to compare our approach to others.
+compare.py: contains functions used to compare our approach using different datasets and/or parameters.
 
-dataTreatment.py: functions needed to read our different datasets.
+dataTreatment.py: functions to manipulate datasets.
+
+particularDataTreatment.py: functions needed to read different datasets in particular.
 
 clusterQuality.py: Evaluation of individual cluster qualities.
 
+DecisionTreeTest.py : comparitive baseline using Decision Tree, as seen in the IDA article.
 
 %----------------
 

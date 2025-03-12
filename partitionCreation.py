@@ -10,10 +10,8 @@ from basePartitions import genBaseKmeans
 
 from clusterSelection import main
 from postProcess import *
-from vizual import
 from particularDataTreatment import *
-from clusterQuality import computeWCSSs,accurate_jaccard,jaccard_sample,overlapping_ari_with_alignment,jaccard_micro
-from modelZeta import launchCPmodelZeta
+from clusterQuality import computeWCSSs,accurate_jaccard,overlapping_ari_with_alignment
 
 #--- CP MODEL ---
 
@@ -214,8 +212,6 @@ def launchCPmodel(idObj:int,N:int,V:int,instanceClusterMatrix:list,Kmin:int,Kmax
 
     return
 
-#TODO added obj on number of covered object  (using instPatDF) and limit on number of selected patterns per cluster
-#TODO add obj on discrimination
 def launchCPmodelNewObj(idObj:int,N:int,V:int,instanceClusterMatrix:list,Kmin:int,Kmax:int,
                   apparMin:int,apparMax:int,D:list,clustPatDF:pd.DataFrame,instPatDF:pd.DataFrame,listPat:list,clustSizes:list,
                   maxCovOutPer:int,nbMaxMoreThan1:int,nbMaxLessThan1:int,nbMaxDiffThan1:int,
@@ -307,7 +303,6 @@ def launchCPmodelNewObj(idObj:int,N:int,V:int,instanceClusterMatrix:list,Kmin:in
     #nbrCoveredAndOneClust=sum((isInstanceCovered[o]==True and (nbOfClusterForEachInstance[o]==1)) for o in range(N)) #number of covered instances, i.e. instances represented by at least 1 selected pattern of a cluster they belong to.
     nbrCoveredAndOneClust=sum(isInstanceCovAnd1Clust) #number of covered instances, i.e. instances represented by at least 1 selected pattern of a cluster they belong to.
     nbrOverallPat=sum( sum([candidateDescr[c]]) for c in range(V) ) #overall number of descriptors selected in cluster descriptions
-    #TODO min or mean discr ?
 
     if(idObj==0): #minimize number of instances attributed to 0 cluster
         obj=nbrInstNoClust
@@ -407,8 +402,7 @@ def launchCPmodelNewObj(idObj:int,N:int,V:int,instanceClusterMatrix:list,Kmin:in
             if(str(type(candidateDescr[c]))!="<class 'cpmpy.expressions.variables._IntVarImpl'>" and len((candidateDescr[c])>maxNbPatPerClust)): #If more than one original descriptor
                 model += (sum(candidateDescr[c])<=maxNbPatPerClust)
 
-    else:   #does not need to work; unable to find results OR simple param pb ? #TODO this constraint needs to be modified if obj is to max the discrimination (via the else ?)
-        #If a cluster is selected then all of its patterns that do not cover any other cluster are selected in its final description.
+    else:
         for c in range(V):
             for d in range(len(D[c])):
                 p=D[c][d]
@@ -491,8 +485,6 @@ def launchCPmodelNewObj(idObj:int,N:int,V:int,instanceClusterMatrix:list,Kmin:in
 
     return
 
-#TODO added obj on number of covered object  (using instPatDF) and limit on number of selected patterns per cluster
-#TODO add obj on discrimination
 def launchCPmodelNewObjRephrased(idObj:int,N:int,V:int,instanceClusterMatrix:list,Kmin:int,Kmax:int,
                   apparMin:int,apparMax:int,D:list,clustPatDF:pd.DataFrame,instPatDF:pd.DataFrame,listPat:list,clustSizes:list,
                   maxCovOutPer:int,nbMaxMoreThan1:int,nbMaxLessThan1:int,nbMaxDiffThan1:int,
@@ -583,7 +575,6 @@ def launchCPmodelNewObjRephrased(idObj:int,N:int,V:int,instanceClusterMatrix:lis
     #nbrCoveredAndOneClust=sum((isInstanceCovered[o]==True and (nbOfClusterForEachInstance[o]==1)) for o in range(N)) #number of covered instances, i.e. instances represented by at least 1 selected pattern of a cluster they belong to.
     nbrCoveredAndOneClust=sum(isInstanceCovAnd1Clust) #number of covered instances, i.e. instances represented by at least 1 selected pattern of a cluster they belong to.
     nbrOverallPat=sum( sum([candidateDescr[c]]) for c in range(V) ) #overall number of descriptors selected in cluster descriptions
-    #TODO min or mean discr ?
 
     if(idObj==0): #minimize number of instances attributed to 0 cluster
         obj=nbrInstNoClust
@@ -725,9 +716,7 @@ def launchCPmodelNewObjRephrased(idObj:int,N:int,V:int,instanceClusterMatrix:lis
             if(str(type(candidateDescr[c]))!="<class 'cpmpy.expressions.variables._IntVarImpl'>" and len((candidateDescr[c])>maxNbPatPerClust)): #If more than one original descriptor
                 model += (sum(candidateDescr[c])<=maxNbPatPerClust)
 
-        else:   #does not need to work; unable to find results OR simple param pb ? #TODO this constraint needs to be modified if obj is to max the discrimination (via the else ?)
-        #If a cluster is selected then all of its patterns that do not cover any other cluster are selected in its final description.
-        #for c in range(V):
+        else:
             for d in range(len(D[c])):
                 p=D[c][d]
                 patThreshold=(maxCovOutPer*clustSizes[c])/100 #max number of instances in c1 covered by outside patterns
@@ -762,8 +751,6 @@ def launchCPmodelNewObjRephrased(idObj:int,N:int,V:int,instanceClusterMatrix:lis
 
     return
 
-#TODO added obj on number of covered object  (using instPatDF) and limit on number of selected patterns per cluster
-#TODO add obj on discrimination
 def launchCPmodelNewObj(idObj:int,N:int,V:int,instanceClusterMatrix:list,Kmin:int,Kmax:int,
                   apparMin:int,apparMax:int,D:list,clustPatDF:pd.DataFrame,instPatDF:pd.DataFrame,listPat:list,clustSizes:list,
                   maxCovOutPer:int,nbMaxMoreThan1:int,nbMaxLessThan1:int,nbMaxDiffThan1:int,
@@ -855,7 +842,6 @@ def launchCPmodelNewObj(idObj:int,N:int,V:int,instanceClusterMatrix:list,Kmin:in
     #nbrCoveredAndOneClust=sum((isInstanceCovered[o]==True and (nbOfClusterForEachInstance[o]==1)) for o in range(N)) #number of covered instances, i.e. instances represented by at least 1 selected pattern of a cluster they belong to.
     nbrCoveredAndOneClust=sum(isInstanceCovAnd1Clust) #number of covered instances, i.e. instances represented by at least 1 selected pattern of a cluster they belong to.
     nbrOverallPat=sum( sum([candidateDescr[c]]) for c in range(V) ) #overall number of descriptors selected in cluster descriptions
-    #TODO min or mean discr ?
 
     if(idObj==0): #minimize number of instances attributed to 0 cluster
         obj=nbrInstNoClust
@@ -955,8 +941,7 @@ def launchCPmodelNewObj(idObj:int,N:int,V:int,instanceClusterMatrix:list,Kmin:in
             if(str(type(candidateDescr[c]))!="<class 'cpmpy.expressions.variables._IntVarImpl'>" and len((candidateDescr[c])>maxNbPatPerClust)): #If more than one original descriptor
                 model += (sum(candidateDescr[c])<=maxNbPatPerClust)
 
-    else:   #does not need to work; unable to find results OR simple param pb ? #TODO this constraint needs to be modified if obj is to max the discrimination (via the else ?)
-        #If a cluster is selected then all of its patterns that do not cover any other cluster are selected in its final description.
+    else:
         for c in range(V):
             for d in range(len(D[c])):
                 p=D[c][d]
@@ -1371,7 +1356,6 @@ def launchCPmodelMultiAnswer(idObj:int,N:int,V:int,instanceClusterMatrix:list,Km
     F_List=[]
     nbOfClusterForEachInstance_List=[]
     candidateDescr_List=[]
-    #TODO using multiple solutions
     def collect():
         print('Find a new optimal solution with obj'+str(idObj)+" =",obj.value())
         nbrInstNoClustList.append(nbrInstNoClust.value())
@@ -1544,9 +1528,9 @@ def launchCPmodelWCSS(idObj:int,N:int,V:int,instanceClusterMatrix:list,Kmin:int,
 def launchICES(dataName,dataPath,resultFolderPath,resultFileName,patternCoveragePercentage,maxCovOutPer,patType,
                bpKmin,bpKmax,finalKmin,finalKmax,baseAlgorithms,idObj,
                minAppar=0,maxAppar=2,nbMaxMoreThan1=400,nbMaxLessThan1=400,nbMinLessThan1=0,nbMinMoreThan1=0,
-               precompBC=[],precompFiltered=[],tsne=False,repeatBPgen=1,maxNbPatPerClust=5,
-               actKinPer=50,maxPharmaSize=7,ncEx=None,
-               modelExec:bool=True,treeCompare:bool=False,verbose:bool=False,enforcedClusters=[],precomputedObjValue=None,
+               precompBC=[],precompFiltered=[],repeatBPgen=1,maxNbPatPerClust=5,
+               ncEx=None,
+               modelExec:bool=True,verbose:bool=False,enforcedClusters=[],precomputedObjValue=None,
                allowInclusion:bool=True,patPreference:int=0,gaussianNoise=(0,0)):
     """ Launches our full approach.
 
@@ -1565,27 +1549,15 @@ def launchICES(dataName,dataPath,resultFolderPath,resultFileName,patternCoverage
     precomputedDist=[]
     precomputedSim=[]
 
-    #Choose and read the dataset
-    ifif(dataName in ["Automobile","automobile","auto","Auto","AUTOMOBILE","car","cars"]):
-        #featureSpace,tagSpace,tagNames=prepareAutomobileData(readAutomobileData(dataPath,False)) #AUTOMOBILE data, deprecated
+    #- Choose and read the dataset.
+    # To launch the method on another dataset, users must and an elif option here.
+    if(dataName in ["Automobile","automobile","auto","Auto","AUTOMOBILE","car","cars"]):
         numVals,binVals,binValsNames,prices,convertedVals,convertedValsNames,priceDistances,wholeDescriptorSpace,wholeDescriptorSpaceNames=prepareAutomobileData(readAutomobileData(dataPath,False)) #AUTOMOBILE data
         featureSpace=prices
         featureSpace=[[f,1] for f in featureSpace]
         tagSpace=wholeDescriptorSpace
         tagNames=wholeDescriptorSpaceNames
         precomputedSim=convertDistInSim(priceDistances)
-
-        #allClust=[[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 84, 85, 86, 87, 88, 89, 97, 98, 99, 100, 101, 102, 103, 105, 106, 107, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 132, 133, 134, 140, 141, 142, 143, 144, 145, 146, 147], [0, 18, 30, 42, 71, 72, 73, 77, 78, 91, 92, 104, 108, 129, 130, 136, 148, 149], [1, 2, 3, 4, 5, 6, 7, 32, 43, 44, 45, 46, 47, 48, 74, 75, 76, 79, 80, 81, 82, 83, 90, 93, 94, 95, 96, 131, 137, 138, 139, 150, 151, 152, 153, 154, 155, 156, 157, 158]]
-        #allClust=[[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 31, 33, 34, 35, 36, 37, 38, 39, 40, 41, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 84, 85, 86, 87, 88, 89, 97, 98, 99, 100, 101, 102, 103, 105, 106, 107, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 132, 133, 134, 140, 141, 142, 143, 144, 145, 146, 147], [0, 18, 30, 42, 71, 72, 73, 77, 78, 91, 92, 104, 108, 129, 130, 135, 136, 148, 149], [1, 2, 3, 4, 5, 6, 7, 32, 43, 44, 45, 46, 47, 48, 74, 75, 76, 79, 80, 81, 82, 83, 90, 93, 94, 95, 96, 131, 137, 138, 139, 150, 151, 152, 153, 154, 155, 156, 157, 158]]
-        #nbOfClusterForEachInstance=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-        #nbOfClusterForEachInstance=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-        #allClustLen=[100, 18, 40]
-        #allClustLen=[100, 19, 40]-
-        #labels=genLabels(allClust,len(featureSpace),nbOfClusterForEachInstance)
-        #print(len(labels),len(nbOfClusterForEachInstance),max(labels))
-        #tagSpace bc featurespace only contains prices
-        #vizualizePartition1D(len(allClust),featureSpace,labels,resultFolderPath)
-        #print(z)
     elif(dataName in ["flags","FLAGS","flag","Flag","Flags","FLAG"]):
         wholeFlagSpace,wholeCountrySpace,wholeFlagSpaceNames,wholeCountrySpaceNames=loadFlagsData(dataPath) #FLAGS data, full flag view
         featureSpace=wholeFlagSpace
@@ -1606,34 +1578,10 @@ def launchICES(dataName,dataPath,resultFolderPath,resultFileName,patternCoverage
         featureSpace=wholeCountrySpace
         tagSpace=wholeFlagSpace
         tagNames=wholeFlagSpaceNames
-    elif(dataName in ["adult","Adult","ADULT"]):
-        featureSpace,tagSpace,tagNames=prepareAdultDataset(dataPath) #ADULT data
-        #featureSpace,tagSpace,tagNames,precomputedSim=prepareAdultDataset() #ADULT data
     elif(dataName in ["iris","Iris","IRIS","UCIiris","irisCompet","irisTest"]):
         featureSpace,tagSpace,tagNames,groundTruth,classNames=loadUCIDataset([2,4]) #UCI Iris dataset. 2: median, 4: quartiles
-    #elif(dataName in ["art","Art","artificial","Artificial","small","Small"]):
-    #    featureSpace,tagSpace,tagNames,groundTruth=prepareArtif() #artificial visual dataset
     elif(dataName in ["circles",'Circles','circle','Circle']):
         featureSpace,groundTruth,tagNames,tagSpace=prepareCirclesRandom(precomputed=True)
-
-    elif(dataName in ["halfmoon",'Halfmoon','half','moons']):
-        featureSpace,groundTruth,tagNames,tagSpace,clustHalfmoon,colorsPart,shapesPart,sizesPart,discretizedTag,discretizedTagNames=prepareHalfmoonRandom(precomputed=True,showDescr=False)
-        #featureSpace,groundTruth,tagNames,tagSpace,clustHalfmoon,colorsPart,shapesPart,sizesPart,discretizedTag,discretizedTagNames=prepareHalfmoonRandom(shapeBias=False,showDescr=True)
-        #featureSpace,groundTruth,tagNames,tagSpace,clustHalfmoon,colorsPart,shapesPart,sizesPart,discretizedTag,discretizedTagNames=prepareHalfmoonRandom()
-    elif(dataName in ["halfmoonNeg",'HalfmoonNeg','halfNeg','moonsNeg']):
-        featureSpace,groundTruth,tagNames,tagSpace,clustHalfmoon=prepareHalfmoonRandom(precomputed=True)
-        tagNames,tagSpace=createNegTagSpace(tagNames,tagSpace)
-        from skmine.itemsets import LCM
-        for k in range(2):
-            tagsInC=getTagsIdsForClusterInstances(tagSpace,clustHalfmoon[k])
-            lcm = LCM(min_supp=1)
-            patterns = lcm.fit_discover(tagsInC)
-            patK= patterns.values.tolist()
-            patKnames=[[[tagNames[t] for t in pat[0]],pat[1]] for pat in patK]
-            print('patK:',patK)
-            print(patKnames)
-
-        print(z)
     elif(dataName in ["AWA2","AwA2","awa2","AWA","AwA","aWa","awa","animals"]):
             featureSpace,tagSpace,tagNames,groundTruth,classNames=prepareAWA2() #AWA2 dataset
     elif(dataName in ["Students","Student","student","students"]):
@@ -1644,8 +1592,6 @@ def launchICES(dataName,dataPath,resultFolderPath,resultFileName,patternCoverage
         featureSpace,tagSpace,K,groundTruth,featureNames,tagNames,instanceNames=prepareZoo()
     elif(dataName in ['artif','Artificial','artif0']):
         featureSpace,tagSpace,tagNames,gtAttrMat=artifDataGeneration(overlapOpt=0)
-        #print(featureSpace,tagSpace,tagNames)
-        #print(z)
     elif(dataName in ['artif1','artfiv1']):
         featureSpace,tagSpace,tagNames,gtAttrMat=artifDataGeneration(overlapOpt=1)
     elif(dataName in ['artif2','artifv2']):
@@ -1669,40 +1615,6 @@ def launchICES(dataName,dataPath,resultFolderPath,resultFileName,patternCoverage
         featureSpace = featureSpace + noise
         print('Gaussian noise added:',gaussianNoise)
 
-    #Comparison
-    if(treeCompare):
-        #testDream(np.array(tagSpace),np.array(tagSpace),[0 for i in range(len(tagSpace))],6,tagNames,dataName,resultFolderPath+"_testDreaM",n_init = 1,plot=False)
-        #dreamTime,part,convRules,convRulesId=testDream(np.array(tagSpace),np.array(featureSpace),[0 for i in range(len(tagSpace))],3,tagNames,dataName,resultFolderPath+"_testDreaM",n_init = 1,plot=False)
-        #analyseDreaM(dataName,3,len(tagSpace),part,convRulesId)
-        #print(z)
-
-        K=finalKmin
-        kmList=[]
-        #_,BaseP=genBaseKmeans(featureSpace,2,3,200)
-        #kmList=BaseP[0]
-        kmeans_model = KMeans(n_clusters=K,n_init=10).fit(featureSpace) #Added n_init=10 because it is the default value, that need to be explicitlfy specified due to update 1.4 of sklearn
-        labels = kmeans_model.labels_
-        #kmList.append(list(labels))
-        #kmList.append(kmeans_model) #ValueError: X has 8 features, but KMeans is expecting 2 features as input.
-
-        IMMres=TreePipeline(tagSpace,[0 for i in range(len(tagSpace))],K,dataName,kmList=kmList,plotTree=False)
-        #IMMres=TreePipeline(featureSpace,[0 for i in range(len(tagSpace))],K,dataName,kmList=kmList,plotTree=True)
-        kmlab,treelab,Expl,qualityMeasures,exkmcTime=IMMres[0]
-        #print(IMMres[0])
-        showPartition(K,featureSpace,treelab)
-        #print(z)
-        opt=[]
-        if(dataName in ["halfmoon",'Halfmoon','half','moons'] or dataName in ["circles",'Circles','circle','Circle']):
-            opt=(featureSpace,groundTruth,tagNames,tagSpace)
-        TKMpart,Tdescr,Tlens,Tmetrics=analyseDreaM(dataName,K,len(tagSpace),kmlab,Expl,opt=opt)
-        treeKMARI=round(metrics.adjusted_rand_score(TKMpart,groundTruth),2)
-        treeARI=round(metrics.adjusted_rand_score(treelab,groundTruth),2)
-        print('treeARI:',treeARI)
-        treeRes=[treelab,Tdescr,Tlens,Tmetrics,treeARI]
-        print('--- End tree baseline ---')
-        print(z)
-    else:
-        treeRes=[]
 
     maxClustSize=len(featureSpace)
     maxCoveredOutOfClusterOption=len(featureSpace)-1 #Dataset-wise discr.
@@ -1748,13 +1660,6 @@ def launchICES(dataName,dataPath,resultFolderPath,resultFileName,patternCoverage
             res=launchCPmodelWCSS(idObj,N,V,instanceClusterMat,Kmin,Kmax,minAppar,maxAppar,D,clustPatDF,clustSizes,maxCovOutPer,nbMaxMoreThan1,nbMaxLessThan1,nbMaxDiffThan1,clustWCSSs,[],[])
         else:
             if(precomputedObjValue==None):
-                #print('instPatDF.columns:',instPatDF.columns,len(instPatDF.columns))
-                #print(listPat,len(listPat))
-                #print(z)
-                #res=launchCPmodel(idObj,N,V,instanceClusterMat,Kmin,Kmax,minAppar,maxAppar,D,clustPatDF,clustSizes,maxCovOutPer,nbMaxMoreThan1,nbMaxLessThan1,nbMaxDiffThan1,MSs=endEnforcedInd)
-                #res=launchCPmodel(idObj,N,V,instanceClusterMat,Kmin,Kmax,minAppar,maxAppar,D,clustPatDF,clustSizes,maxCovOutPer,nbMaxMoreThan1,nbMaxLessThan1,nbMaxDiffThan1,nbMinMoreThan1,nbMinLessThan1,MSs=endEnforcedInd)
-                #res=-(3,N,V,instanceClusterMat,Kmin,Kmax,minAppar,maxAppar,D,clustPatDF,instPatDF,listPat,clustSizes,maxCovOutPer,nbMaxMoreThan1,nbMaxLessThan1,nbMaxDiffThan1,nbMinMoreThan1,nbMinLessThan1,MSs=endEnforcedInd)
-                #res=launchCPmodelNewObj(idObj,N,V,instanceClusterMat,Kmin,Kmax,minAppar,maxAppar,D,clustPatDF,instPatDF,listPat,clustSizes,maxCovOutPer,nbMaxMoreThan1,nbMaxLessThan1,nbMaxDiffThan1,nbMinMoreThan1,nbMinLessThan1,MSs=endEnforcedInd,maxNbPatPerClust=maxNbPatPerClust,patPreference=patPreference)
                 res=launchCPmodelNewObjRephrased(idObj,N,V,instanceClusterMat,Kmin,Kmax,minAppar,maxAppar,D,clustPatDF,instPatDF,listPat,clustSizes,maxCovOutPer,nbMaxMoreThan1,nbMaxLessThan1,nbMaxDiffThan1,nbMinMoreThan1,nbMinLessThan1,MSs=endEnforcedInd,maxNbPatPerClust=maxNbPatPerClust,patPreference=patPreference)
             else:
                 resMultiAnswer=launchCPmodelMultiAnswer(idObj,N,V,instanceClusterMat,Kmin,Kmax,minAppar,maxAppar,D,clustPatDF,clustSizes,maxCovOutPer,nbMaxMoreThan1,nbMaxLessThan1,nbMaxDiffThan1,nbMinMoreThan1,nbMinLessThan1,MSs=endEnforcedInd,objectiveValue=precomputedObjValue)
@@ -1791,13 +1696,9 @@ def launchICES(dataName,dataPath,resultFolderPath,resultFileName,patternCoverage
                     patIPCs_List.append(patIPCs)
                     #clusters,descr,kin,tagNames,PCRs,DCs,IPCs,unattr,groupAndFam,BP,afs,ufs,
                 print('DEBUG MultiAnswer with '+str(len(F_List))+' different solutions.')#:',F_List)
-                #optionalRes=(allKins,allKinsName,patPCRs,patIPCs,featureSpace,assignedFeatureSpace,objValue)
                 allKins=[]
                 allKinsName=[]
                 return N,BP,allClust_List,allClustLen_List,descrNames_List,descrPatIds_List,descrTagsIds_List,nbOfClusterForEachInstance_List,PCRs_List,DCs_List,IPCs_List,patPCRs,patDCs_List,patIPCs_List,precomputedObjValue,allKins,allKinsName
-                print(z)
-                return
-
 
         if res is None:
             params=[baseAlgorithms,repeatBPgen,maxClustSize,patternCoveragePercentage,patType,V,clustPatDF.shape,Kmin,Kmax,minAppar,maxAppar,maxCovOutPer,nbMaxMoreThan1,nbMaxLessThan1,nbMaxDiffThan1,idObj]
@@ -1907,45 +1808,31 @@ def launchICES(dataName,dataPath,resultFolderPath,resultFileName,patternCoverage
                 labels=genLabels(allClust,N,nbOfClusterForEachInstance)
                 ARI=round(metrics.adjusted_rand_score(labels,groundTruth),2)
                 WCSSval=round(postWCSS/sum(F)/100,2)
-                #optionalRes=(ARI,WCSSval,optionalRes)
                 print("ARI: ",ARI)
             else:
                 WCSSval=round(postWCSS/sum(F)/100,2)
-                #optionalRes=(WCSSval,optionalRes)
         elif(nbMaxMoreThan1==0 and nbMaxLessThan1==0):
             labels=genLabels(allClust,N,nbOfClusterForEachInstance)
             ARI=round(metrics.adjusted_rand_score(labels,groundTruth),2)
-            #optionalRes=(ARI,optionalRes)
             print("ARI: ",ARI)
         optionalRes=(ARI,WCSSval,optionalRes)
-
-    elif(("moon" in dataName) or (dataName in ["circles",'Circles','circle','Circle'])):
-        labels=genLabels(allClust,N,nbOfClusterForEachInstance)
-        ARI=round(metrics.adjusted_rand_score(labels,groundTruth),2)
-        print("ARI: ",ARI)
-        optionalRes+=[ARI]
-        #showArtifDataSplit(featureSpace,labels,colorsPart,shapesPart,sizesPart)
 
     elif("flag" in dataName or "Flag" in dataName):
         countryNames=showFlagComp(dataPath,allClust)
         optionalRes=countryNames
         print(countryNames)
 
-    elif(dataName in ["Automobile","automobile","auto","Auto","AUTOMOBILE","car","cars"]):
-        #featureSpace,tagSpace,tagNames=prepareAutomobileData(readAutomobileData(dataPath,False)) #AUTOMOBILE data, deprecated
+    elif(dataName in ["Automobile","automobile","auto","Auto","AUTOMOBILE","car","cars"]): #UCI Automobile dataset
         optionalRes=[[round(np.mean([prices[i] for i in clust]),2) for clust in allClust],[round(np.std([prices[i] for i in clust]),2) for clust in allClust]]
         print('Mean automobile prices:',optionalRes)
         print('Cluster lengths:',[len(clust) for clust in allClust])
 
-    elif(dataName in ["Students","Student","student","students"]):
-        #TODO compute stats of results of students in each clusters
+    elif(dataName in ["Students","Student","student","students"]): #UCI Student dataset
         ClusterStudentGradesMean=[[np.mean(featureSpace[s]) for s in clust] for clust in allClust]
         for k in range(len(ClusterStudentGradesMean)):
             cg=ClusterStudentGradesMean[k]
-            #print('DEBUG cg:',cg)
             print('Grades of C'+str(k)+'\'s '+str(len(allClust[k]))+' students:','mean:',round(np.mean(cg),2),'std:',round(np.std(cg),2),'median:',round(np.median(cg),2),'min:',round(min(cg),2),'max:',round(max(cg),2))
         optionalRes=[np.mean(ClusterStudentGradesMean[k]) for k in range(len(ClusterStudentGradesMean))]
-        #print('Mean average student score:',optionalRes)
 
     elif('artif' in dataName):
         #Create attribution matrix (only works if no unassigned !)
@@ -1963,12 +1850,6 @@ def launchICES(dataName,dataPath,resultFolderPath,resultFileName,patternCoverage
         print('Clustering Jaccard evaluation value:',evalclustering_jaccard)
         optionalRes=[(evalclustering_ari2,evalclustering_jaccard,nbNotAttrib)]
 
-    elif(dataName in ['SecondaryMushroom','secondaryMushroom','smushroom','sMushroom']):
-        ClusterEdibleNumber=[np.sum([gt[i] for i in allClust[k]]) for k in range(len(allClust))]
-        for k in range(len(allClust)):
-            print('Number of edible mushroom in clust',k,':',ClusterEdibleNumber[k])
-        optionalRes=ClusterEdibleNumber
-
     #Write parameters and results
     resultTextPath=resultFolderPath+"/output-"+resultFileName+".txt"
     params=[baseAlgorithms,repeatBPgen,maxClustSize,patternCoveragePercentage,patType,V,clustPatDF.shape,Kmin,Kmax,minAppar,maxAppar,maxCovOutPer,nbMaxMoreThan1,nbMaxLessThan1,nbMaxDiffThan1,idObj]
@@ -1977,73 +1858,26 @@ def launchICES(dataName,dataPath,resultFolderPath,resultFileName,patternCoverage
     resNames=['times','allClust','allClustLen','descrNames','descrPatIds','descrTagsIds','nbNotAttrib','nbMultiAttrib','nbOfClusterForEachInstance',"----",'PCRs','DCs','IPSs','SINGs','IPCs','patPCRs','patDCs','patIPSs','patSINGs','patIPCs','Optional results']
     writeResults(resultTextPath,params,res,paramsNames,resNames)
 
-    if(tsne):
-        labels=genLabels(allClust,N,nbOfClusterForEachInstance)
-        if(dataName in ["Automobile","automobile","auto","Auto","AUTOMOBILE","car","cars"]):
-            vizualizePartition1D(len(allClust),featureSpace,labels,resultFolderPath)
-        elif('artif' in dataName):
-            vizualizePartition(len(allClust),featureSpace,labels,resultFolderPath)
-        elif(dataName in ['NC','NewCaledonia','nc','NC1014','NC5690','Thibaut'] or ('NC' in dataName)):
-            NCProjPath='NC1014_proj.csv'
-            projSpace=readProjSpace(NCProjPath,delimiter=',')
-            if(ncEx!=None):
-                if(ncEx<8 or ncEx>=0):
-                    projSpace=[projSpace[i] for i in range(len(projSpace)) if gt[i]==ncEx]
-            vizualizePartition(len(allClust),projSpace,labels,resultFolderPath)
-        else:
-            lauchTSNE(featureSpace,labels,len(allClustLen)+1,resultFolderPath,"TSNE_"+dataName,10, TSNEmetric='euclidean',TSNEinit='random',TSNEiter=5000)
-        #TypeError: __init__() got an unexpected keyword argument 'square_distances
-
     if(verbose):
         print()
         print(descrNames)
 
-    #TODO return filteringRes avoiding pipeline repetition
-    #TODO return lists with the unattributed and the overlapping molecules ?
-    return times,BasePartitions,BP,filteringRes,allClust,allClustLen,descrNames,descrPatIds,descrTagsIds,nbOfClusterForEachInstance,PCRs,DCs,IPSs,SINGs,IPCs,optionalRes,treeRes
+    return times,BasePartitions,BP,filteringRes,allClust,allClustLen,descrNames,descrPatIds,descrTagsIds,nbOfClusterForEachInstance,PCRs,DCs,IPSs,SINGs,IPCs,optionalRes
 
 #---------------------------------
 #------ TEST AREA ------
 
-autoPath="imports-85.data"
-flagPath="flag.data"
-adultPath="/adult.data"
-studentpathMat="student-mat.csv"
-studentpathPor="student-por.csv"
-NCPath='NC1014_clustering.csv'
-
-def normal_mainTestECS():
-    #timeAnalysis(dataName,5,resultFolderPath)
-    dataName='NC' #'Automobile' #'iris'
-    resultFileName=dataName+'rob'#+"ncRandom"#"_NC0rephrasedkm_inc_tag"
-    dataPath=NCPath #flagPath #autoPath #invovldPath #not import for iris.
-    distMatPath=""
-    resultFolderPath="foldername"
-    cov=30
-    discr=10
-    patType="tag" #'tag','pat'
-    bpKmin=4
-    bpKmax=15
-    finalKmin=9#2
-    finalKmax=9#8
-    nbOv=20
-    nbUna=20
-    baseAlgorithms=['Kmeans'] #"Kmeans","Spectral","SpectralNN",'DBSCAN'
-    idObj=9#3
-    treeCompare=not True
-    allowInclusion=True
-    patPreference=0 #0 : no preference. 1 : favorize more general patterns. 2 : favorize more specific patterns.
-    ncEx=0#None
-    nbRepeatBP=2
-    comparisonRobust(dataName,dataPath,resultFolderPath,resultFileName,cov,discr,patType,bpKmin,bpKmax,finalKmin,finalKmax,
-               baseAlgorithms,idObj,nbOv,nbUna,nbRepeatBP,True,ncEx,treeCompare,
-               verbose=True,allowInclusion=allowInclusion,patPreference=patPreference,locs=[0],scales=[0,0.5])
-    #launchICES(dataName,dataPath,resultFolderPath,resultFileName,cov,discr,patType,bpKmin,bpKmax,finalKmin,finalKmax,
-    #           baseAlgorithms,idObj,nbMaxMoreThan1=nbOv,nbMaxLessThan1=nbUna,repeatBPgen=nbRepeatBP,tsne=True,ncEx=ncEx,treeCompare=treeCompare,
-    #           verbose=True,allowInclusion=allowInclusion,patPreference=patPreference)
+#Paths to datasets
+autoPath="datasets/imports-85.data"
+flagPath="datasets/flag.data"
+studentpathMat="datasets/student-mat.csv"
+studentpathPor="datasets/student-por.csv"
+NCPath='datasets/NC1014_clustering.csv'
 
 def mainTestECS():
-    dataName='artif4' #'Automobile' #'iris'
+    """Main informations. change values here to test different datasets and/or parameters.
+    To add new datasets, see line 1553."""
+    dataName='artif0' #'Automobile' #'iris'
     resultFileName=dataName #+"ncRandom"#"_NC0rephrasedkm_inc_tag"
     dataPath=NCPath
     distMatPath=""
@@ -2057,15 +1891,14 @@ def mainTestECS():
     finalKmax=3#8
     nbOv=100 #0
     nbUna=5
-    baseAlgorithms=['Kmeans','Spectral'] #"Kmeans","Spectral","SpectralNN",'DBSCAN'
+    baseAlgorithms=['Kmeans','Spectral'] #"Kmeans","Spectral","Hierarchical"
     idObj=9#3
-    treeCompare=not True
     allowInclusion=True
     patPreference=0 #0 : no preference. 1 : favorize more general patterns. 2 : favorize more specific patterns.
-    ncEx=0#None
-    nbRepeatBP=4
+    ncEx=0#None #Parameter only to chosea particular NC exercice.
+    nbRepeatBP=3 #number of BP generations
     launchICES(dataName,dataPath,resultFolderPath,resultFileName,cov,discr,patType,bpKmin,bpKmax,finalKmin,finalKmax,
-               baseAlgorithms,idObj,nbMaxMoreThan1=nbOv,nbMaxLessThan1=nbUna,repeatBPgen=nbRepeatBP,tsne=True,ncEx=ncEx,treeCompare=treeCompare,
+               baseAlgorithms,idObj,nbMaxMoreThan1=nbOv,nbMaxLessThan1=nbUna,repeatBPgen=nbRepeatBP,ncEx=ncEx,
                verbose=True,allowInclusion=allowInclusion,patPreference=patPreference)
 
 mainTestECS()
